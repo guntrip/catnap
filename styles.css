@@ -1,29 +1,104 @@
+@font-face {
+    font-family: notosans;
+    src: url('fonts/NotoSans-Regular.ttf');
+    font-weight:	normal
+}
+@font-face {
+    font-family: notosans;
+    src: url('fonts/NotoSans-Bold.ttf');
+    font-weight:	bold
+}
+
 body {
   background-color: #edeef0;
   padding:0;
   margin:0;
-  font-family: 'Arial Narrow', Arial, sans-serif;
+  font-family: 'notosans';
 }
 
 .header {
   background-color: #fff;
 }
 
-.header .pause {
-  padding:8px;
+.header .catface {
+  vertical-align: top;
+  margin:5px;
+  width:50px;
+  height:50px;
   display:inline-block;
+  background-size: 100% 100%;
 }
+
+    .header .catface.cat1 { background-image: url("icons/1.png"); }
+    .header .catface.cat2 { background-image: url("icons/2.png"); }
+    .header .catface.cat3 { background-image: url("icons/3.png"); }
+    .header .catface.cat4 { background-image: url("icons/4.png"); }
+    .header .catface.cat5 { background-image: url("icons/5.png"); }
 
 .header .status {
   display:inline-block;
-  padding: 8px 0px 8px 0px;
+  padding: 10px 0px 8px 0px;
 }
 
   .header .status .playpause {
     font-weight:bold;
-    font-size:0.9em;
+    font-size:1em;
   }
 
   .header .status .info {
-    font-size:0.8em;
+    font-size:0.9em;
+  }
+
+  .slideControl {
+
+  }
+
+    .slideControl label {
+      display:inline-block;
+      width:100px;
+      margin:5px;
+    }
+
+    .slideControl label .title {
+      font-weight:bold;
+      font-size:0.8em;
+    }
+
+    .slideControl label .val {
+      font-size:0.8em;
+    }
+
+      .slideControl .checklabel {
+        font-size:0.8em;
+      }
+
+  .slideControl .slide {
+    vertical-align: middle;
+    margin-top:-18px;
+    margin-left:10px;
+    width:300px;
+  }
+
+  /* jqueryui */
+  .ui-slider-horizontal {
+    height:5px;
+    display:inline-block;
+  }
+
+  .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header .ui-state-default {
+    background:#59595c;
+    border-radius:10px;
+  }
+
+  .ui-slider .ui-slider-handle {
+    width:0.8em;
+    height:0.8em;
+  }
+
+  .ui-widget-header {
+    background: #fff;
+  }
+
+  .ui-widget-content {
+
   }

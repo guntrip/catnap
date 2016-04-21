@@ -2,27 +2,75 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
-    <link rel="stylesheet"  href="styles.css" type="text/css" />
+    <title>Nap cat</title>
+    <script>
+      window.nodeRequire = require;
+      delete window.require;
+      delete window.exports;
+      delete window.module;
+    </script>
+    <script src="jquery/jquery-1.12.3.min.js"></script>
+    <script src="jquery/jquery-ui.min.js"></script>
+    <script src="controls.js"></script>
     <script src="window.js"></script>
+    <link rel="stylesheet" href="jquery/jquery-ui.css">
     <link rel="stylesheet" href="Font-Awesome/css/font-awesome.min.css">
+    <link rel="stylesheet"  href="styles.css" type="text/css" />
   </head>
   <body>
 
     <div class="header">
 
-        <div class="pause">
-          <i class="fa fa-pause fa-2x"></i>
-        </div>
+        <div class="catface">&nbsp;</div>
 
         <div class="status">
-            <div class="playpause">Active</div>
-            <div class="info">32 minutes until your next 5 minute break</div>
+            <div class="playpause" id="playpause">Active</div>
+            <div class="info" id="clockinfo">32 minutes until your next 5 minute break</div>
         </div>
 
     </div>
 
-    <h3 onclick="require('remote').getGlobal('naptrack').clock=60;">nap!!</h3>
-    <h3 onclick="napTest();">nap!!</h3>
+    <!-- controls -->
+
+      <!-- time between naps -->
+
+      <!-- nap wait -->
+      <div class="slideControl">
+        <label>
+          <div class="title">Work</div>
+          <div class="val" id="nap-wait-val">60 minutes</div>
+        </label>
+
+        <div id="nap-wait" class="slide"></div>
+
+      </div>
+
+      <!-- nap length -->
+      <div class="slideControl">
+        <label>
+          <div class="title">Rest</div>
+          <div class="val" id="nap-duration-val">5 minutes</div>
+        </label>
+
+        <div id="nap-length" class="slide"></div>
+
+      </div>
+      <!--<div id="nap-length" style="display:inline-block;margin-left:20px;"></div>-->
+
+      <!-- track mouse/windows -->
+      <div class="slideControl">
+        <label>
+          <div class="title">Track</div>
+        </label>
+
+        <div style="display:inline-block;">
+            <input type="checkbox" id="track-mouse"> <label for="track-mouse" class="checklabel">Mouse</label>
+            <input type="checkbox" id="track-windows"> <label for="track-windows" class="checklabel">Windows</label>
+        </div>
+
+      </div>
+
+    <!--<h3 onclick="require('remote').getGlobal('naptrack').clock=60;">nap!!</h3>
+    <h3 onclick="napTest();">nap!!</h3>-->
   </body>
 </html>

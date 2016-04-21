@@ -28,7 +28,7 @@ global.naptrack = {
     last: []
   },
   settings: {
-    interval: 3, // 60 seconds, change for debug only
+    interval: 1, // 60 seconds, change for debug only
     nap: 60, // minutes
     duration: 5 // minutes
   },
@@ -36,7 +36,8 @@ global.naptrack = {
   intervalIncrease: 1, // clock increases
   napClock: 0, // tracks time spend in nap
   enabled:true,
-  test:'flooble',
+  napping: false, // presently napping?
+  catInUse:'1',
   a:false
 };
 
@@ -48,13 +49,13 @@ let napWindow;
 
 function createWindow () {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 440,
-                                  height: 260,
+  mainWindow = new BrowserWindow({width: 460,
+                                  height: 240,
                                   maximizable:false,
                                   minimizable: true,
                                   closable: true,
-                                  resizable: false,
-                                  icon: 'icons/test.png'});
+                                  resizable: true,
+                                  icon: 'icons/1-32.png'});
 
   mainWindow.setMenuBarVisibility(false);
 
@@ -149,12 +150,35 @@ function createTrayIcon() {
   });
 }
 
-function changeTrayIcon(icon) {
+function changeIcon(iconref) {
+  appIcon.setImage('icons/'+iconref+'-16.png');
+}
 
-  var filename='icon.png';
-  if (icon==='b') filename='iconb.png';
+function updateCatFaces() {
 
-  appIcon.setImage(filename);
+  // What image shall we use?
+  if (global.naptrack.napping) {
+    var image = '5';
+  } else {
+
+    var nap = global.naptrack.settings.nap, clock = global.naptrack.clock;
+    var percent = Math.round(((nap-clock) / nap) * 100);
+
+    var image = '1';
+    if ( (percent<101) && (percent>60) ) { image = '1'; }
+    if ( (percent<61) && (percent>40) ) { image = '2'; }
+    if ( (percent<41) && (percent>20) ) { image = '3'; }
+    if ( (percent<21) && (percent>-1) ) { image = '4'; }
+
+  }
+
+    // Update Tray
+    changeIcon(image);
+
+    // Update global for mainWindow
+    global.naptrack.catInUse=image;
+
+    mainWindow.webContents.executeJavaScript('updateClockText()');
 
 }
 
@@ -202,6 +226,8 @@ function check() {
 
   if (movement) {
 
+    changeIcon('5');
+
     // Increment the counter!
     global.naptrack.clock = global.naptrack.clock + global.naptrack.intervalIncrease;
 
@@ -211,15 +237,7 @@ function check() {
 
   }
 
-  /*if (global.naptrack.a) {
-    global.naptrack.a=false;
-    changeTrayIcon('b');
-  } else {
-    global.naptrack.a=true;
-    changeTrayIcon('a');
-  }*/
-
-  console.log(global.naptrack.clock);
+   updateCatFaces();
 
   }
 
@@ -248,7 +266,6 @@ function compareWindows() {
   if (a.length!==b.length) {
     changed = true;
   } else {
-    console.log(b);
     for (var i = 0; i < a.length; i++) {
       if (!changed) {
         if (b[i]) {
@@ -271,6 +288,11 @@ function compareWindows() {
 function napTime() {
 
   if (napWindow==null) {
+
+    global.naptrack.napping=true;
+
+    updateCatFaces();
+
 
     // reset clock to 0
     global.naptrack.clock = 0;
@@ -307,7 +329,7 @@ function napTime() {
     if (napProcess) { clearInterval(napProcess); }
 
     // set interval
-    napProcess = setInterval(napInterval, 10);
+    napProcess = setInterval(napInterval, 1000); // 1000. Shorten for debugging.
 
   }
 
@@ -342,7 +364,9 @@ function cancelNapInterval() {
     napWindow=null;
   }
 
+  global.naptrack.napping=false;
   resetClock();
   initCheck();
+  updateCatFaces();
 
 }

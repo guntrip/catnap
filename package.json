@@ -1,27 +1,24 @@
 {
-  "name": "electron-quick-start",
+  "name": "nap-cat",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "A break timer",
   "main": "main.js",
   "scripts": {
     "start": "electron main.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron/electron-quick-start.git"
+    "url": "git+https://github.com/stevecat/napcat/"
   },
   "keywords": [
-    "Electron",
-    "quick",
-    "start",
-    "tutorial"
+    "breaks",
+    "nap",
+    "timer",
+    "activity"
   ],
-  "author": "GitHub",
+  "author": "stevecat",
   "license": "CC0-1.0",
-  "bugs": {
-    "url": "https://github.com/electron/electron-quick-start/issues"
-  },
-  "homepage": "https://github.com/electron/electron-quick-start#readme",
+  "homepage": "https://stevecat/net/",
   "devDependencies": {
     "electron-prebuilt": "^0.37.0"
   }

@@ -1,0 +1,29 @@
+body {
+  background-color: #edeef0;
+  padding:0;
+  margin:0;
+  font-family: 'Arial Narrow', Arial, sans-serif;
+}
+
+.header {
+  background-color: #fff;
+}
+
+.header .pause {
+  padding:8px;
+  display:inline-block;
+}
+
+.header .status {
+  display:inline-block;
+  padding: 8px 0px 8px 0px;
+}
+
+  .header .status .playpause {
+    font-weight:bold;
+    font-size:0.9em;
+  }
+
+  .header .status .info {
+    font-size:0.8em;
+  }

@@ -2,18 +2,18 @@
 
 const electron = require('electron');
 const ipc = require('ipc');
-// Module to control application life.
 const app = electron.app;
-// Module to create native browser window.
 const BrowserWindow = electron.BrowserWindow;
-
 const Menu = electron.Menu;
 const Tray = electron.Tray;
 
-var electronScreen = null;
-var appIcon = null;
+let mainWindow;
+let napWindow;
+
+var electronScreen = null, appIcon = null;
 var checkProcess = null, napProcess = null;
 
+// Settings + defaults
 global.naptrack = {
   tracking: {
     mouse: true,
@@ -37,18 +37,29 @@ global.naptrack = {
   napClock: 0, // tracks time spend in nap
   enabled:true,
   napping: false, // presently napping?
-  catInUse:'1',
-  a:false
+  catInUse:'1' // current icon (1-5)
 };
 
+app.on('ready', function () {
+  createWindow();
+  createTrayIcon();
+  initCheck();
+});
 
-// Keep a global reference of the window object, if you don't, the window will
-// be closed automatically when the JavaScript object is garbage collected.
-let mainWindow;
-let napWindow;
+app.on('window-all-closed', function () {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', function () {
+  if (mainWindow === null) {
+    createWindow();
+  }
+});
 
 function createWindow () {
-  // Create the browser window.
+
   mainWindow = new BrowserWindow({width: 460,
                                   height: 250,
                                   maximizable:false,
@@ -58,66 +69,24 @@ function createWindow () {
                                   icon: 'icons/1-32.png'});
 
   mainWindow.setMenuBarVisibility(false);
-
-  // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
-
-  // Open the DevTools.
   //mainWindow.webContents.openDevTools();
 
-  // Register electron.screen
+  mainWindow.loadURL('file://' + __dirname + '/index.html');
+
   electronScreen = electron.screen;
-  //desktopCapturer = electron.desktopCapturer;
 
-  //checkMouse();
-  //checkWindows();
+  mainWindow.on('closed', function() { mainWindow = null; });
 
-  // Emitted when the window is closed.
-  mainWindow.on('closed', function() {
-    // Dereference the window object, usually you would store windows
-    // in an array if your app supports multi windows, this is the time
-    // when you should delete the corresponding element.
-    mainWindow = null;
-  });
-
-  // Minimise to Tray
-  mainWindow.on('minimize', function() {
-    windowHide();
-  });
+  mainWindow.on('minimize', function() { windowHide(); });
 
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-app.on('ready', function () {
-  createWindow();
-  createTrayIcon();
-  initCheck();
-});
-
-// Quit when all windows are closed.
-app.on('window-all-closed', function () {
-  // On OS X it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-app.on('activate', function () {
-  // On OS X it's common to re-create a window in the app when the
-  // dock icon is clicked and there are no other windows open.
-  if (mainWindow === null) {
-    createWindow();
-  }
-});
-
-// IPC:
 ipc.on('nap', function () {
+  // allows browsers to initiate a nap.
   napTime();
 })
 
-// Window functions:
+// Hide window and taskbar
 function windowHide() {
   if (mainWindow!==null) {
   mainWindow.hide();
@@ -125,6 +94,7 @@ function windowHide() {
   }
 }
 
+// Show window and taskbar
 function windowShow() {
   if (mainWindow===null) {
   createWindow();
@@ -134,22 +104,22 @@ function windowShow() {
   }
 }
 
-
 function createTrayIcon() {
   appIcon = new Tray('icons/1-16.png');
   var contextMenu = Menu.buildFromTemplate([
     { label: 'Open window', click:windowShow },
-    { label: 'Rest now', click:napTime },
+    { label: 'Break now', click:napTime },
     { type: 'separator' },
-    //{ label: 'Enabled', type: 'checkbox', checked: true },
     { label: 'Exit', click:function() { app.quit();  } }
   ]);
+
   appIcon.setContextMenu(contextMenu);
   updateTooltip();
 
   appIcon.on('click', function () {
    windowShow();
   });
+
 }
 
 function changeIcon(iconref) {
@@ -162,7 +132,7 @@ function updateTooltip() {
   appIcon.setToolTip('Time for a break');
   } else {
   var minutesLeft = global.naptrack.settings.nap -  global.naptrack.clock;
-  appIcon.setToolTip(minutesLeft+' minutes until your next rest :3');
+  appIcon.setToolTip(minutesLeft+' minutes until your next break :3');
   }
 }
 
@@ -195,6 +165,7 @@ function updateCatFaces() {
 }
 
 // Loops and checks
+
 function resetClock() { global.naptrack.clock = 0; }
 
 function initCheck() {
@@ -213,9 +184,8 @@ function check() {
 
   if (global.naptrack.enabled) {
 
-  // We should only increment the counter if there have been recent
-  // movement. If window tracking is enabled, only check if
-  // mouse returns false.
+  // If there's been recent activity, increment the clock.
+  // This is all async, we're really checking the last one.
 
   var movement = false;
 
@@ -230,7 +200,6 @@ function check() {
   if ((global.naptrack.tracking.windows)&&(mainWindow!==null)&&(!movement)) {
 
     // Update titles on mainWindow and check
-    // async so we're really comparing /last/ time.
     mainWindow.webContents.executeJavaScript('gatherWindowTitles()');
     movement = compareWindows();
 
@@ -243,13 +212,13 @@ function check() {
 
   if (movement) {
 
-
-    // Increment the counter!
+    // Increment the clock
     global.naptrack.clock = global.naptrack.clock + global.naptrack.intervalIncrease;
 
-     if ( global.naptrack.clock > (global.naptrack.settings.nap-1) ) {
+    // Time for a break?
+    if ( global.naptrack.clock > (global.naptrack.settings.nap-1) ) {
       napTime();
-     }
+    }
 
   }
 
@@ -301,7 +270,8 @@ function compareWindows() {
 
 }
 
-// Alerts
+// Break time!
+
 function napTime() {
 
   if (napWindow==null) {
@@ -310,11 +280,8 @@ function napTime() {
 
     updateCatFaces();
 
-
-    // reset clock to 0
+    // Stop the clock!
     global.naptrack.clock = 0;
-
-    // stop timer
     stopCheck();
 
     // create nap window
@@ -332,21 +299,15 @@ function napTime() {
 
     // and load the index.html of the app.
     napWindow.loadURL('file://' + __dirname + '/nap.html');
-
-    // Open the DevTools.
     //napWindow.webContents.openDevTools();
 
-    // Emitted when the window is closed.
     napWindow.on('closed', function() {
       cancelNapInterval();
     });
 
     // Start the napInterval timer
     global.naptrack.napClock = 0;
-
     if (napProcess) { clearInterval(napProcess); }
-
-    // set interval
     napProcess = setInterval(napInterval, 1000); // 1000. Shorten for debugging.
 
     mainWindow.webContents.executeJavaScript('updateClockText()');
@@ -358,20 +319,21 @@ function napTime() {
 
 function napInterval() {
 
-  // Update progress
+  // Update progress (Windows)
   if (dbl===0) {
   var dbl = 0;
   } else {
   var dbl = ( global.naptrack.napClock / (global.naptrack.settings.duration*60) );
   }
-
   napWindow.setProgressBar(dbl);
 
-  // Increase
+  // Increase nap clock
   global.naptrack.napClock = global.naptrack.napClock + 1;
 
+  // Update nap.html
   napWindow.webContents.executeJavaScript('updateCountdown()');
 
+  // Break over?
   if (global.naptrack.napClock > ((global.naptrack.settings.duration*60)-1) ) {
     napWindow.close();
     cancelNapInterval();

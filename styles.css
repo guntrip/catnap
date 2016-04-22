@@ -102,3 +102,31 @@ body {
   .ui-widget-content {
 
   }
+
+  /* nap page */
+  body.nap {
+    background-color: #fff;
+  }
+
+  body.nap .napcat {
+    margin:auto;
+    margin-top:10px;
+    width:125px;
+    height:125px;
+    background-size: 100% 100%;
+    background-image: url("icons/5.png");
+  }
+
+  body.nap .message {
+    margin:auto;
+    text-align: center;
+    font-size:1.3em;
+    font-weight:bold;
+  }
+
+  body.nap .countdown {
+    margin:auto;
+    text-align: center;
+    font-size:1.1em;
+    margin-bottom:10px;
+  }

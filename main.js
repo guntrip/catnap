@@ -28,7 +28,7 @@ global.naptrack = {
     last: []
   },
   settings: {
-    interval: 1, // 60 seconds, change for debug only
+    interval: 60, // 60 seconds, change for debug only
     nap: 60, // minutes
     duration: 5 // minutes
   },
@@ -302,7 +302,8 @@ function napTime() {
 
     // create nap window
     napWindow = new BrowserWindow({width: 400,
-                                   height: 200,
+                                   height: 240,
+                                   icon: 'icons/5-32.png',
                                    center: true,
                                    maximizable:false,
                                    minimizable: false,
@@ -348,6 +349,8 @@ function napInterval() {
 
   // Increase
   global.naptrack.napClock = global.naptrack.napClock + 1;
+
+  napWindow.webContents.executeJavaScript('updateCountdown()');
 
   if (global.naptrack.napClock > ((global.naptrack.settings.duration*60)-1) ) {
     napWindow.close();

@@ -14,15 +14,26 @@ body {
   padding:0;
   margin:0;
   font-family: 'notosans';
+
+  /* no touching */
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently
+                                  not supported by any browser */
 }
 
 .header {
   background-color: #fff;
+  cursor:default;
 }
 
 .header .catface {
   vertical-align: top;
   margin:5px;
+  margin-left:10px;
   width:50px;
   height:50px;
   display:inline-block;
@@ -47,6 +58,19 @@ body {
 
   .header .status .info {
     font-size:0.9em;
+  }
+
+  .header .help {
+    float:right;
+    margin:10px;
+    color:#4e4c60;
+    cursor: pointer;
+  }
+
+  .header .help:hover { color: #000; }
+
+  .controls {
+    padding:10px;
   }
 
   .slideControl {
@@ -76,7 +100,7 @@ body {
     vertical-align: middle;
     margin-top:-18px;
     margin-left:10px;
-    width:300px;
+    width:270px;
   }
 
   /* jqueryui */
@@ -117,11 +141,21 @@ body {
     background-image: url("icons/5.png");
   }
 
+  body.nap .napcat.peek {
+    background-image: url("icons/peek.png");
+  }
+
+  body.nap .peekloader {
+    background-image: url("icons/peek.png");
+    display:none;
+  }
+
   body.nap .message {
     margin:auto;
     text-align: center;
     font-size:1.3em;
     font-weight:bold;
+    cursor:default;
   }
 
   body.nap .countdown {
@@ -129,4 +163,5 @@ body {
     text-align: center;
     font-size:1.1em;
     margin-bottom:10px;
+    cursor:default;
   }

@@ -50,7 +50,7 @@ let napWindow;
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 460,
-                                  height: 240,
+                                  height: 250,
                                   maximizable:false,
                                   minimizable: true,
                                   closable: true,
@@ -134,16 +134,18 @@ function windowShow() {
   }
 }
 
+
 function createTrayIcon() {
   appIcon = new Tray('icons/1-16.png');
   var contextMenu = Menu.buildFromTemplate([
-    { label: 'Item1', type: 'radio' },
-    { label: 'Item2', type: 'radio' },
-    { label: 'Item3', type: 'radio', checked: true },
-    { label: 'Item4', type: 'radio' }
+    { label: 'Open window', click:windowShow },
+    { label: 'Rest now', click:napTime },
+    { type: 'separator' },
+    //{ label: 'Enabled', type: 'checkbox', checked: true },
+    { label: 'Exit', click:function() { app.quit();  } }
   ]);
-  appIcon.setToolTip('This is my application.');
   appIcon.setContextMenu(contextMenu);
+  updateTooltip();
 
   appIcon.on('click', function () {
    windowShow();
@@ -152,6 +154,16 @@ function createTrayIcon() {
 
 function changeIcon(iconref) {
   appIcon.setImage('icons/'+iconref+'-16.png');
+  updateTooltip();
+}
+
+function updateTooltip() {
+  if (global.naptrack.settings.napping) {
+  appIcon.setToolTip('Time for a break');
+  } else {
+  var minutesLeft = global.naptrack.settings.nap -  global.naptrack.clock;
+  appIcon.setToolTip(minutesLeft+' minutes until your next rest :3');
+  }
 }
 
 function updateCatFaces() {
@@ -224,9 +236,13 @@ function check() {
 
   }
 
+  if ( (!global.naptrack.tracking.mouse) && (!global.naptrack.tracking.windows) ) {
+    // with both tracking disabled, we should act like a simple counter.
+    movement=true;
+  }
+
   if (movement) {
 
-    changeIcon('5');
 
     // Increment the counter!
     global.naptrack.clock = global.naptrack.clock + global.naptrack.intervalIncrease;
@@ -238,6 +254,7 @@ function check() {
   }
 
    updateCatFaces();
+   updateTooltip();
 
   }
 
@@ -331,6 +348,9 @@ function napTime() {
 
     // set interval
     napProcess = setInterval(napInterval, 1000); // 1000. Shorten for debugging.
+
+    mainWindow.webContents.executeJavaScript('updateClockText()');
+    updateTooltip();
 
   }
 

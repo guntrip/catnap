@@ -24,21 +24,23 @@
         <div class="catface">&nbsp;</div>
 
         <div class="status">
-            <div class="playpause" id="playpause">Active</div>
-            <div class="info" id="clockinfo">32 minutes until your next 5 minute break</div>
+            <div class="playpause" id="playpause"></div>
+            <div class="info" id="clockinfo"></div>
         </div>
+
+        <div class="help" onclick="help();"><i class="fa fa-question-circle"></i></div>
 
     </div>
 
     <!-- controls -->
 
-      <!-- time between naps -->
+    <div class="controls">
 
       <!-- nap wait -->
       <div class="slideControl">
         <label>
           <div class="title">Work</div>
-          <div class="val" id="nap-wait-val">60 minutes</div>
+          <div class="val" id="nap-wait-val"><i class="fa fa-clock-o "></i> 60 minutes</div>
         </label>
 
         <div id="nap-wait" class="slide"></div>
@@ -48,8 +50,8 @@
       <!-- nap length -->
       <div class="slideControl">
         <label>
-          <div class="title">Rest</div>
-          <div class="val" id="nap-duration-val">5 minutes</div>
+          <div class="title">Break</div>
+          <div class="val" id="nap-duration-val"><i class="fa fa-clock-o "></i> 5 minutes</div>
         </label>
 
         <div id="nap-length" class="slide"></div>
@@ -60,16 +62,17 @@
       <!-- track mouse/windows -->
       <div class="slideControl">
         <label>
-          <div class="title">Track</div>
+          <div class="title"><i class="fa fa-search"></i> Track</div>
         </label>
 
         <div style="display:inline-block;">
-            <input type="checkbox" id="track-mouse"> <label for="track-mouse" class="checklabel">Mouse</label>
-            <input type="checkbox" id="track-windows"> <label for="track-windows" class="checklabel">Windows</label>
+            <input type="checkbox" id="track-mouse" onclick="checkboxChanged();" checked><label for="track-mouse" class="checklabel"><i class="fa fa-mouse-pointer"></i> Mouse</label>
+            <input type="checkbox" id="track-windows" onclick="checkboxChanged();" checked><label for="track-windows" class="checklabel"><i class="fa fa-laptop"></i> Windows</label>
         </div>
 
       </div>
 
+    </div>
     <!--<h3 onclick="require('remote').getGlobal('naptrack').clock=60;">nap!!</h3>
     <h3 onclick="napTest();">nap!!</h3>-->
   </body>

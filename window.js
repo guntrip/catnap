@@ -1,8 +1,5 @@
 const ipc = nodeRequire('ipc');
 
-var twat = nodeRequire('remote').getGlobal('naptrack');
-//alert(twat.test);
-
 function gatherWindowTitles() {
 
   var desktopCapturer = nodeRequire('electron').desktopCapturer;
@@ -33,17 +30,31 @@ function updateClockText() {
 
   // status
   if (nodeRequire('remote').getGlobal('naptrack').enabled) {
-    $('#playpause').html('Active');
+    if (nodeRequire('remote').getGlobal('naptrack').napping) {
+    $('#playpause').html('Resting');
+    } else {
+      if ( (!nodeRequire('remote').getGlobal('naptrack').tracking.mouse) && (!nodeRequire('remote').getGlobal('naptrack').tracking.windows) ) {
+      $('#playpause').html('Counting down');  
+      } else {
+      $('#playpause').html('Tracking activity');
+      }
+    }
   } else {
     $('#playpause').html('Disabled');
   }
 
   // WAit
-  var breaklength = nodeRequire('remote').getGlobal('naptrack').settings.duration;
-  var clock = nodeRequire('remote').getGlobal('naptrack').clock;
-  var nap = nodeRequire('remote').getGlobal('naptrack').settings.nap;
+  if (!nodeRequire('remote').getGlobal('naptrack').napping) {
 
-  $('#clockinfo').html( (nap-clock) + ' minutes until your next '+breaklength+' minute break');
+    var breaklength = nodeRequire('remote').getGlobal('naptrack').settings.duration;
+    var clock = nodeRequire('remote').getGlobal('naptrack').clock;
+    var nap = nodeRequire('remote').getGlobal('naptrack').settings.nap;
+
+    $('#clockinfo').html( (nap-clock) + ' minutes until your next '+breaklength+' minute break');
+
+  } else {
+    $('#clockinfo').html('Get up!');
+  }
 
   // Update cat face
   $('.header .catface').removeClass('cat1 cat2 cat3 cat4 cat5');
@@ -53,4 +64,9 @@ function updateClockText() {
 
 function updateCat() {
 
+}
+
+function help() {
+  const shell = nodeRequire('electron').shell;
+  shell.openExternal('http://stevecat.net/catnap/');
 }

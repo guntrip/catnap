@@ -54,7 +54,7 @@ function createWindow () {
                                   maximizable:false,
                                   minimizable: true,
                                   closable: true,
-                                  resizable: true,
+                                  resizable: false,
                                   icon: 'icons/1-32.png'});
 
   mainWindow.setMenuBarVisibility(false);

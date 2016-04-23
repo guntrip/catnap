@@ -1,3 +1,8 @@
+var version = "0.01"; // alter with a format change to the settings stored in
+                      // local storage, will ask the user to reconfigure.
+
+var readableNumbers=["Never", "Once", "Twice", "Thrice"];
+
 const ipc = nodeRequire('ipc');
 
 function gatherWindowTitles() {
@@ -31,12 +36,16 @@ function updateClockText() {
   // status
   if (nodeRequire('remote').getGlobal('naptrack').enabled) {
     if (nodeRequire('remote').getGlobal('naptrack').napping) {
-    $('#playpause').html('Resting');
+      $('#playpause').html('Break time');
     } else {
-      if ( (!nodeRequire('remote').getGlobal('naptrack').tracking.mouse) && (!nodeRequire('remote').getGlobal('naptrack').tracking.windows) ) {
-      $('#playpause').html('Counting down');  
+      if (nodeRequire('remote').getGlobal('naptrack').snoozing) {
+        $('#playpause').html('Snoozing');
       } else {
-      $('#playpause').html('Tracking activity');
+        if ( (!nodeRequire('remote').getGlobal('naptrack').tracking.mouse) && (!nodeRequire('remote').getGlobal('naptrack').tracking.windows) ) {
+          $('#playpause').html('Counting down');
+        } else {
+          $('#playpause').html('Tracking activity');
+        }
       }
     }
   } else {
@@ -53,7 +62,7 @@ function updateClockText() {
     $('#clockinfo').html( (nap-clock) + ' minutes until your next '+breaklength+' minute break');
 
   } else {
-    $('#clockinfo').html('Get up!');
+    $('#clockinfo').html('Stretch your legs!');
   }
 
   // Update cat face

@@ -13,6 +13,9 @@ let napWindow;
 var electronScreen = null, appIcon = null;
 var checkProcess = null, napProcess = null;
 
+var closedByskip=false;
+var devTools=false;
+
 // Settings + defaults
 global.naptrack = {
   tracking: {
@@ -30,14 +33,17 @@ global.naptrack = {
   settings: {
     interval: 60, // 60 seconds, change for debug only
     nap: 60, // minutes
-    duration: 5 // minutes
+    duration: 5, // minutes
+    skip: 0 // how many skips
   },
   clock: 0, // minutes
   intervalIncrease: 1, // clock increases
   napClock: 0, // tracks time spend in nap
   enabled:true,
   napping: false, // presently napping?
-  catInUse:'1' // current icon (1-5)
+  catInUse:'1', // current icon (1-5)
+  skipCount: 0, // how many times have we skipd?
+  snoozing: false
 };
 
 app.on('ready', function () {
@@ -60,8 +66,8 @@ app.on('activate', function () {
 
 function createWindow () {
 
-  mainWindow = new BrowserWindow({width: 460,
-                                  height: 250,
+  mainWindow = new BrowserWindow({width: 435,
+                                  height: 270,
                                   maximizable:false,
                                   minimizable: true,
                                   closable: true,
@@ -69,14 +75,13 @@ function createWindow () {
                                   icon: 'icons/1-32.png'});
 
   mainWindow.setMenuBarVisibility(false);
-  //mainWindow.webContents.openDevTools();
+  if (devTools) { mainWindow.webContents.openDevTools(); }
 
   mainWindow.loadURL('file://' + __dirname + '/index.html');
 
   electronScreen = electron.screen;
 
   mainWindow.on('closed', function() { mainWindow = null; });
-
   mainWindow.on('minimize', function() { windowHide(); });
 
 }
@@ -84,6 +89,11 @@ function createWindow () {
 ipc.on('nap', function () {
   // allows browsers to initiate a nap.
   napTime();
+})
+
+ipc.on('skipButton', function () {
+  // allows browsers to initiate a nap.
+  skipButton();
 })
 
 // Hide window and taskbar
@@ -114,7 +124,6 @@ function createTrayIcon() {
   ]);
 
   appIcon.setContextMenu(contextMenu);
-  updateTooltip();
 
   appIcon.on('click', function () {
    windowShow();
@@ -132,7 +141,7 @@ function updateTooltip() {
   appIcon.setToolTip('Time for a break');
   } else {
   var minutesLeft = global.naptrack.settings.nap -  global.naptrack.clock;
-  appIcon.setToolTip(minutesLeft+' minutes until your next break :3');
+  appIcon.setToolTip(minutesLeft+' minutes until your next break.');
   }
 }
 
@@ -160,7 +169,9 @@ function updateCatFaces() {
     // Update global for mainWindow
     global.naptrack.catInUse=image;
 
+    if (mainWindow!==null) {
     mainWindow.webContents.executeJavaScript('updateClockText()');
+    }
 
 }
 
@@ -277,6 +288,8 @@ function napTime() {
   if (napWindow==null) {
 
     global.naptrack.napping=true;
+    global.naptrack.snoozing=false;
+    closedByskip=false;
 
     updateCatFaces();
 
@@ -284,9 +297,15 @@ function napTime() {
     global.naptrack.clock = 0;
     stopCheck();
 
+    // Are there skips left?
+    var skipHeight=0;
+    if (global.naptrack.skipCount<(global.naptrack.settings.skip)) {
+      skipHeight=40; // Increase window height for skip button
+    }
+
     // create nap window
     napWindow = new BrowserWindow({width: 400,
-                                   height: 240,
+                                   height: 230+skipHeight,
                                    icon: 'icons/5-32.png',
                                    center: true,
                                    maximizable:false,
@@ -299,7 +318,7 @@ function napTime() {
 
     // and load the index.html of the app.
     napWindow.loadURL('file://' + __dirname + '/nap.html');
-    //napWindow.webContents.openDevTools();
+    if (devTools) { napWindow.webContents.openDevTools(); }
 
     napWindow.on('closed', function() {
       cancelNapInterval();
@@ -335,6 +354,7 @@ function napInterval() {
 
   // Break over?
   if (global.naptrack.napClock > ((global.naptrack.settings.duration*60)-1) ) {
+    global.naptrack.napping=false;
     napWindow.close();
     cancelNapInterval();
   }
@@ -349,9 +369,60 @@ function cancelNapInterval() {
     napWindow=null;
   }
 
+  // If the timer finishes, napping is set to false.
+  if (global.naptrack.napping) {
+
+    // they manually shut the window,
+    // treat as a skip
+
+    if ((global.naptrack.skipCount===global.naptrack.settings.skip) ||
+        (global.naptrack.settings.skip===0)) {
+
+      // they are max-skip, or have no skips set, so give up, reset.
+      global.naptrack.skipCount=0;
+      resetClock();
+
+    } else {
+
+      // Set the skip! Similar to skipButton().
+      global.naptrack.skipCount=global.naptrack.skipCount+1;
+      global.naptrack.clock=(global.naptrack.settings.nap - global.naptrack.settings.duration);
+      global.naptrack.snoozing=true;
+
+    }
+
+  } else {
+
+    if (!closedByskip) {
+      // They were good and waited for the timer.
+      global.naptrack.skipCount=0;
+      resetClock();
+    }
+
+  }
+
   global.naptrack.napping=false;
-  resetClock();
+
   initCheck();
   updateCatFaces();
+
+}
+
+function skipButton() {
+
+  // Increase skip count
+  global.naptrack.skipCount=global.naptrack.skipCount+1;
+
+  // Set clock to nap length.
+  global.naptrack.clock=(global.naptrack.settings.nap - global.naptrack.settings.duration);
+
+  // Set by skip so the window close doesn't cause choas
+  closedByskip=true;
+
+  global.naptrack.snoozing=true;
+
+  // Close the window
+  global.naptrack.napping=false;
+  napWindow.close(); // triggers cancelNapInterval
 
 }

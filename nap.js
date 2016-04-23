@@ -1,4 +1,5 @@
 const electron = nodeRequire('electron');
+const ipc = nodeRequire('ipc');
 
 function updateCountdown() {
 
@@ -16,9 +17,32 @@ function updateCountdown() {
 
   message += extraSeconds+" seconds left.";
 
+  if ( (fullMinutes>0) && (extraSeconds==0) ) {
+    message=fullMinutes+' minutes left.';
+  }
+
   $('.countdown').html(message);
 
 }
+
+// skip?
+$(function() {
+
+   // Initial update countdown
+   updateCountdown();
+
+  if (nodeRequire('remote').getGlobal('naptrack').skipCount<(nodeRequire('remote').getGlobal('naptrack').settings.skip)) {
+
+    $('.skiploader').html('<div class="skipButton" onclick="skip();"><i class="fa fa-repeat"></i> Skip</div>');
+
+    $('.skipButton').click(function() {
+      // use IPC to use skipButton function in main.js.
+      ipc.send('skipButton');
+    })
+
+  }
+
+})
 
 // Completely pointless peeking eye fun
 $(function() {startPeek(); } );

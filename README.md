@@ -1,18 +1,18 @@
-# cat nap :cat:
+# Cat nap :cat:
 
-This is a little cat-themed break time. There are a few basic settings:
+This is a little cat-themed break timer. There are a few basic settings:
 
-### Work
+#### Work
 How long would you like to work before a break is suggested? I recommend *55 minutes*.
 
-### Break
+#### Break
 How long should your break be? I recommend *five minutes*.
 
-### Skips
+#### Skips
 If you're in the middle of something important, you might want to delay your break. Think
 of this like a snooze button on an alarm clock. You can select 0 - 3 skips per break alert.
 
-### Tracking
+#### Tracking
 The application will only increment its clock when it detects activity. Your options are
 "mouse", seeing if the mouse cursor has moved in the last minute, and "windows", seeing if
 the titles and order of your top three windows has changed. The latter is an attempt to

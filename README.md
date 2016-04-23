@@ -1,14 +1,18 @@
-# Cat nap :cat:
+# Cat nap :cat::zzz:
 
-This is a little cat-themed break timer. There are a few basic settings:
+This is a little cat-themed break timer. The application monitors activity and
+will pause timing when it detects that you've left your computer. It has a tray/menu bar
+icon that indicates time remaining and it pretty small and unobtrusive.
 
-#### Work
+There are a few basic settings:
+
+#### Work (15 minutes > 3 hours)
 How long would you like to work before a break is suggested? I recommend *55 minutes*.
 
-#### Break
+#### Break (1 minute > 30 minutes)
 How long should your break be? I recommend *five minutes*.
 
-#### Skips
+#### Skips (0-3)
 If you're in the middle of something important, you might want to delay your break. Think
 of this like a snooze button on an alarm clock. You can select 0 - 3 skips per break alert.
 
@@ -51,4 +55,4 @@ Create an issue or, if you're feeling kind, a pull request.
 
 stevecat :heart:
 
-#### License [CC0 (Public Domain)](LICENSE.md)
+**License [CC0 (Public Domain)](LICENSE.md)**

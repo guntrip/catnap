@@ -2,7 +2,7 @@
 
 This is a little cat-themed break timer. The application monitors activity and
 will pause timing when it detects that you've left your computer. It has a tray/menu bar
-icon that indicates time remaining and it pretty small and unobtrusive.
+icon that indicates time remaining and it is pretty small and unobtrusive.
 
 There are a few basic settings:
 

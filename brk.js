@@ -3,7 +3,7 @@ const ipc = nodeRequire('ipc');
 
 function updateCountdown() {
 
-  var secondsLeft = ( nodeRequire('remote').getGlobal('naptrack').settings.duration *60 ) -  nodeRequire('remote').getGlobal('naptrack').napClock;
+  var secondsLeft = ( nodeRequire('remote').getGlobal('catnap').settings.duration *60 ) -  nodeRequire('remote').getGlobal('catnap').brkClock;
   var fullMinutes = Math.floor(secondsLeft / 60);
   var extraSeconds = secondsLeft - (fullMinutes * 60);
 
@@ -31,7 +31,7 @@ $(function() {
    // Initial update countdown
    updateCountdown();
 
-  if (nodeRequire('remote').getGlobal('naptrack').skipCount<(nodeRequire('remote').getGlobal('naptrack').settings.skip)) {
+  if (nodeRequire('remote').getGlobal('catnap').skipCount<(nodeRequire('remote').getGlobal('catnap').settings.skip)) {
 
     $('.skiploader').html('<div class="skipButton" onclick="skip();"><i class="fa fa-repeat"></i> Skip</div>');
 
@@ -59,9 +59,9 @@ function peek() {
   var newPos=escreen.getCursorScreenPoint();
 
   if ( (newPos.x !== mpos.x) || (newPos.y !== mpos.y) ) {
-    $('.napcat').addClass('peek');
+    $('.brkcat').addClass('peek');
   } else {
-    $('.napcat').removeClass('peek');
+    $('.brkcat').removeClass('peek');
   }
 
   mpos=newPos;

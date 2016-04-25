@@ -127,12 +127,12 @@ body {
 
   }
 
-  /* nap page */
-  body.nap {
+  /* brk page */
+  body.brk {
     background-color: #fff;
   }
 
-  body.nap .napcat {
+  body.brk .brkcat {
     margin:auto;
     margin-top:10px;
     width:125px;
@@ -141,16 +141,16 @@ body {
     background-image: url("icons/5.png");
   }
 
-  body.nap .napcat.peek {
+  body.brk .brkcat.peek {
     background-image: url("icons/peek.png");
   }
 
-  body.nap .peekloader {
+  body.brk .peekloader {
     background-image: url("icons/peek.png");
     display:none;
   }
 
-  body.nap .message {
+  body.brk .message {
     margin:auto;
     text-align: center;
     font-size:1.3em;
@@ -158,7 +158,7 @@ body {
     cursor:default;
   }
 
-  body.nap .countdown {
+  body.brk .countdown {
     margin:auto;
     text-align: center;
     font-size:1.1em;
@@ -166,7 +166,7 @@ body {
     cursor:default;
   }
 
-  body.nap .skipButton {
+  body.brk .skipButton {
     cursor:pointer;
     width:140px;
     padding:8px;
@@ -177,7 +177,7 @@ body {
     text-align:center;
   }
 
-  body.nap .skipButton:hover {
+  body.brk .skipButton:hover {
     background-color: #ededed;
     border-color: #aaa;
   }

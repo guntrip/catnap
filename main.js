@@ -8,16 +8,16 @@ const Menu = electron.Menu;
 const Tray = electron.Tray;
 
 let mainWindow;
-let napWindow;
+let brkWindow;
 
 var electronScreen = null, appIcon = null;
-var checkProcess = null, napProcess = null;
+var checkProcess = null, brkProcess = null;
 
 var closedByskip=false;
 var devTools=false;
 
 // Settings + defaults
-global.naptrack = {
+global.catnap = {
   tracking: {
     mouse: true,
     windows: true
@@ -32,15 +32,15 @@ global.naptrack = {
   },
   settings: {
     interval: 60, // 60 seconds, change for debug only
-    nap: 60, // minutes
+    brk: 60, // minutes
     duration: 5, // minutes
     skip: 0 // how many skips
   },
   clock: 0, // minutes
   intervalIncrease: 1, // clock increases
-  napClock: 0, // tracks time spend in nap
+  brkClock: 0, // tracks time spend in brk
   enabled:true,
-  napping: false, // presently napping?
+  brkping: false, // presently brkping?
   catInUse:'1', // current icon (1-5)
   skipCount: 0, // how many times have we skipd?
   snoozing: false
@@ -73,6 +73,10 @@ function createWindow () {
   windowSize={x:435, y:270};
   }
 
+  if (devTools) {
+    windowSize={x:800,y:500};
+  }
+
   mainWindow = new BrowserWindow({width: windowSize.x,
                                   height: windowSize.y,
                                   maximizable:false,
@@ -93,13 +97,13 @@ function createWindow () {
 
 }
 
-ipc.on('nap', function () {
-  // allows browsers to initiate a nap.
-  napTime();
+ipc.on('brk', function () {
+  // allows browsers to initiate a brk.
+  brkTime();
 })
 
 ipc.on('skipButton', function () {
-  // allows browsers to initiate a nap.
+  // allows browsers to initiate a brk.
   skipButton();
 })
 
@@ -125,7 +129,7 @@ function createTrayIcon() {
   appIcon = new Tray('icons/1-16.png');
   var contextMenu = Menu.buildFromTemplate([
     { label: 'Open window', click:windowShow },
-    { label: 'Break now', click:napTime },
+    { label: 'Break now', click:brkTime },
     { type: 'separator' },
     { label: 'Exit', click:function() { app.quit();  } }
   ]);
@@ -144,23 +148,23 @@ function changeIcon(iconref) {
 }
 
 function updateTooltip() {
-  if (global.naptrack.settings.napping) {
-  appIcon.setToolTip('Time for a break');
+  if (global.catnap.settings.brkping) {
+  appIcon.setToolTip('Time for a brk');
   } else {
-  var minutesLeft = global.naptrack.settings.nap -  global.naptrack.clock;
-  appIcon.setToolTip(minutesLeft+' minutes until your next break.');
+  var minutesLeft = global.catnap.settings.brk -  global.catnap.clock;
+  appIcon.setToolTip(minutesLeft+' minutes until your next brk.');
   }
 }
 
 function updateCatFaces() {
 
   // What image shall we use?
-  if (global.naptrack.napping) {
+  if (global.catnap.brkping) {
     var image = '5';
   } else {
 
-    var nap = global.naptrack.settings.nap, clock = global.naptrack.clock;
-    var percent = Math.round(((nap-clock) / nap) * 100);
+    var brk = global.catnap.settings.brk, clock = global.catnap.clock;
+    var percent = Math.round(((brk-clock) / brk) * 100);
 
     var image = '1';
     if ( (percent<101) && (percent>60) ) { image = '1'; }
@@ -174,7 +178,7 @@ function updateCatFaces() {
     changeIcon(image);
 
     // Update global for mainWindow
-    global.naptrack.catInUse=image;
+    global.catnap.catInUse=image;
 
     if (mainWindow!==null) {
     mainWindow.webContents.executeJavaScript('updateClockText()');
@@ -184,14 +188,14 @@ function updateCatFaces() {
 
 // Loops and checks
 
-function resetClock() { global.naptrack.clock = 0; }
+function resetClock() { global.catnap.clock = 0; }
 
 function initCheck() {
 
   if (checkProcess) { clearInterval(checkProcess); }
 
   // set interval
-  checkProcess = setInterval(check, (global.naptrack.settings.interval*1000));
+  checkProcess = setInterval(check, (global.catnap.settings.interval*1000));
 
 }
 
@@ -200,14 +204,14 @@ function stopCheck() { if (checkProcess) { clearInterval(checkProcess); } }
 // Run on a timer.
 function check() {
 
-  if (global.naptrack.enabled) {
+  if (global.catnap.enabled) {
 
   // If there's been recent activity, increment the clock.
   // This is all async, we're really checking the last one.
 
   var movement = false;
 
-  if (global.naptrack.tracking.mouse) {
+  if (global.catnap.tracking.mouse) {
 
     // Update and check mouse position
     checkMouse();
@@ -215,7 +219,7 @@ function check() {
 
   }
 
-  if ((global.naptrack.tracking.windows)&&(mainWindow!==null)&&(!movement)) {
+  if ((global.catnap.tracking.windows)&&(mainWindow!==null)&&(!movement)) {
 
     // Update titles on mainWindow and check
     mainWindow.webContents.executeJavaScript('gatherWindowTitles()');
@@ -223,7 +227,7 @@ function check() {
 
   }
 
-  if ( (!global.naptrack.tracking.mouse) && (!global.naptrack.tracking.windows) ) {
+  if ( (!global.catnap.tracking.mouse) && (!global.catnap.tracking.windows) ) {
     // with both tracking disabled, we should act like a simple counter.
     movement=true;
   }
@@ -231,11 +235,11 @@ function check() {
   if (movement) {
 
     // Increment the clock
-    global.naptrack.clock = global.naptrack.clock + global.naptrack.intervalIncrease;
+    global.catnap.clock = global.catnap.clock + global.catnap.intervalIncrease;
 
-    // Time for a break?
-    if ( global.naptrack.clock > (global.naptrack.settings.nap-1) ) {
-      napTime();
+    // Time for a brk?
+    if ( global.catnap.clock > (global.catnap.settings.brk-1) ) {
+      brkTime();
     }
 
   }
@@ -249,14 +253,14 @@ function check() {
 
 function checkMouse() {
 
-  global.naptrack.mouse.last = global.naptrack.mouse.current;
-  global.naptrack.mouse.current = electronScreen.getCursorScreenPoint();
+  global.catnap.mouse.last = global.catnap.mouse.current;
+  global.catnap.mouse.current = electronScreen.getCursorScreenPoint();
 
 }
 
 function compareMouse() {
 
-  var a = global.naptrack.mouse.current, b = global.naptrack.mouse.last, changed = false;
+  var a = global.catnap.mouse.current, b = global.catnap.mouse.last, changed = false;
   if ((a.x !== b.x)||(a.y !== b.y)) { changed=true; }
   return changed;
 
@@ -264,7 +268,7 @@ function compareMouse() {
 
 function compareWindows() {
 
-  var a = global.naptrack.windows.current, b = global.naptrack.windows.last, changed = false;
+  var a = global.catnap.windows.current, b = global.catnap.windows.last, changed = false;
 
   // different number of windows
   if (a.length!==b.length) {
@@ -288,25 +292,25 @@ function compareWindows() {
 
 }
 
-// Break time!
+// brk time!
 
-function napTime() {
+function brkTime() {
 
-  if (napWindow==null) {
+  if (brkWindow==null) {
 
-    global.naptrack.napping=true;
-    global.naptrack.snoozing=false;
+    global.catnap.brkping=true;
+    global.catnap.snoozing=false;
     closedByskip=false;
 
     updateCatFaces();
 
     // Stop the clock!
-    global.naptrack.clock = 0;
+    global.catnap.clock = 0;
     stopCheck();
 
     // Are there skips left?
     var skipHeight=0;
-    if (global.naptrack.skipCount<(global.naptrack.settings.skip)) {
+    if (global.catnap.skipCount<(global.catnap.settings.skip)) {
       skipHeight=40; // Increase window height for skip button
     }
 
@@ -318,8 +322,12 @@ function napTime() {
     windowSize={x:400, y:230};
     }
 
-    // create nap window
-    napWindow = new BrowserWindow({width: windowSize.x,
+    if (devTools) {
+      windowSize={x:800,y:500};
+    }
+
+    // create brk window
+    brkWindow = new BrowserWindow({width: windowSize.x,
                                    height: windowSize.y+skipHeight,
                                    icon: 'icons/5-32.png',
                                    center: true,
@@ -329,20 +337,20 @@ function napTime() {
                                    resizable: false,
                                    alwaysOnTop: true });
 
-    napWindow.setMenuBarVisibility(false);
+    brkWindow.setMenuBarVisibility(false);
 
     // and load the index.html of the app.
-    napWindow.loadURL('file://' + __dirname + '/nap.html');
-    if (devTools) { napWindow.webContents.openDevTools(); }
+    brkWindow.loadURL('file://' + __dirname + '/brk.html');
+    if (devTools) { brkWindow.webContents.openDevTools(); }
 
-    napWindow.on('closed', function() {
-      cancelNapInterval();
+    brkWindow.on('closed', function() {
+      cancelbrkInterval();
     });
 
-    // Start the napInterval timer
-    global.naptrack.napClock = 0;
-    if (napProcess) { clearInterval(napProcess); }
-    napProcess = setInterval(napInterval, 1000); // 1000. Shorten for debugging.
+    // Start the brkInterval timer
+    global.catnap.brkClock = 0;
+    if (brkProcess) { clearInterval(brkProcess); }
+    brkProcess = setInterval(brkInterval, 1000); // 1000. Shorten for debugging.
 
     mainWindow.webContents.executeJavaScript('updateClockText()');
     updateTooltip();
@@ -351,58 +359,58 @@ function napTime() {
 
 }
 
-function napInterval() {
+function brkInterval() {
 
   // Update progress (Windows)
   if (dbl===0) {
   var dbl = 0;
   } else {
-  var dbl = ( global.naptrack.napClock / (global.naptrack.settings.duration*60) );
+  var dbl = ( global.catnap.brkClock / (global.catnap.settings.duration*60) );
   }
-  napWindow.setProgressBar(dbl);
+  brkWindow.setProgressBar(dbl);
 
-  // Increase nap clock
-  global.naptrack.napClock = global.naptrack.napClock + 1;
+  // Increase brk clock
+  global.catnap.brkClock = global.catnap.brkClock + 1;
 
-  // Update nap.html
-  napWindow.webContents.executeJavaScript('updateCountdown()');
+  // Update brk.html
+  brkWindow.webContents.executeJavaScript('updateCountdown()');
 
-  // Break over?
-  if (global.naptrack.napClock > ((global.naptrack.settings.duration*60)-1) ) {
-    global.naptrack.napping=false;
-    napWindow.close();
-    cancelNapInterval();
+  // brk over?
+  if (global.catnap.brkClock > ((global.catnap.settings.duration*60)-1) ) {
+    global.catnap.brkping=false;
+    brkWindow.close();
+    cancelbrkInterval();
   }
 
 }
 
-function cancelNapInterval() {
+function cancelbrkInterval() {
 
-  if (napProcess) { clearInterval(napProcess); }
+  if (brkProcess) { clearInterval(brkProcess); }
 
-  if (napWindow!==null) {
-    napWindow=null;
+  if (brkWindow!==null) {
+    brkWindow=null;
   }
 
-  // If the timer finishes, napping is set to false.
-  if (global.naptrack.napping) {
+  // If the timer finishes, brkping is set to false.
+  if (global.catnap.brkping) {
 
     // they manually shut the window,
     // treat as a skip
 
-    if ((global.naptrack.skipCount===global.naptrack.settings.skip) ||
-        (global.naptrack.settings.skip===0)) {
+    if ((global.catnap.skipCount===global.catnap.settings.skip) ||
+        (global.catnap.settings.skip===0)) {
 
       // they are max-skip, or have no skips set, so give up, reset.
-      global.naptrack.skipCount=0;
+      global.catnap.skipCount=0;
       resetClock();
 
     } else {
 
       // Set the skip! Similar to skipButton().
-      global.naptrack.skipCount=global.naptrack.skipCount+1;
-      global.naptrack.clock=(global.naptrack.settings.nap - global.naptrack.settings.duration);
-      global.naptrack.snoozing=true;
+      global.catnap.skipCount=global.catnap.skipCount+1;
+      global.catnap.clock=(global.catnap.settings.brk - global.catnap.settings.duration);
+      global.catnap.snoozing=true;
 
     }
 
@@ -410,13 +418,13 @@ function cancelNapInterval() {
 
     if (!closedByskip) {
       // They were good and waited for the timer.
-      global.naptrack.skipCount=0;
+      global.catnap.skipCount=0;
       resetClock();
     }
 
   }
 
-  global.naptrack.napping=false;
+  global.catnap.brkping=false;
 
   initCheck();
   updateCatFaces();
@@ -426,18 +434,18 @@ function cancelNapInterval() {
 function skipButton() {
 
   // Increase skip count
-  global.naptrack.skipCount=global.naptrack.skipCount+1;
+  global.catnap.skipCount=global.catnap.skipCount+1;
 
-  // Set clock to nap length.
-  global.naptrack.clock=(global.naptrack.settings.nap - global.naptrack.settings.duration);
+  // Set clock to brk length.
+  global.catnap.clock=(global.catnap.settings.brk - global.catnap.settings.duration);
 
   // Set by skip so the window close doesn't cause choas
   closedByskip=true;
 
-  global.naptrack.snoozing=true;
+  global.catnap.snoozing=true;
 
   // Close the window
-  global.naptrack.napping=false;
-  napWindow.close(); // triggers cancelNapInterval
+  global.catnap.brkping=false;
+  brkWindow.close(); // triggers cancelbrkInterval
 
 }

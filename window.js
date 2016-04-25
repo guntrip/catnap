@@ -11,8 +11,8 @@ function gatherWindowTitles() {
 
   desktopCapturer.getSources({types: ['window']}, function(error, sources) {
     if (!error) {
-      nodeRequire('remote').getGlobal('naptrack').windows.last = nodeRequire('remote').getGlobal('naptrack').windows.current;
-      nodeRequire('remote').getGlobal('naptrack').windows.current = lastThreeTitles(sources);
+      nodeRequire('remote').getGlobal('catnap').windows.last = nodeRequire('remote').getGlobal('catnap').windows.current;
+      nodeRequire('remote').getGlobal('catnap').windows.current = lastThreeTitles(sources);
     }
   });
 
@@ -27,21 +27,21 @@ function lastThreeTitles(array) {
   return result;
 }
 
-function napTest() {
-  ipc.send('nap');
+function brkTest() {
+  ipc.send('brk');
 }
 
 function updateClockText() {
 
   // status
-  if (nodeRequire('remote').getGlobal('naptrack').enabled) {
-    if (nodeRequire('remote').getGlobal('naptrack').napping) {
+  if (nodeRequire('remote').getGlobal('catnap').enabled) {
+    if (nodeRequire('remote').getGlobal('catnap').brkping) {
       $('#playpause').html('Break time');
     } else {
-      if (nodeRequire('remote').getGlobal('naptrack').snoozing) {
+      if (nodeRequire('remote').getGlobal('catnap').snoozing) {
         $('#playpause').html('Snoozing');
       } else {
-        if ( (!nodeRequire('remote').getGlobal('naptrack').tracking.mouse) && (!nodeRequire('remote').getGlobal('naptrack').tracking.windows) ) {
+        if ( (!nodeRequire('remote').getGlobal('catnap').tracking.mouse) && (!nodeRequire('remote').getGlobal('catnap').tracking.windows) ) {
           $('#playpause').html('Counting down');
         } else {
           $('#playpause').html('Tracking activity');
@@ -53,13 +53,13 @@ function updateClockText() {
   }
 
   // WAit
-  if (!nodeRequire('remote').getGlobal('naptrack').napping) {
+  if (!nodeRequire('remote').getGlobal('catnap').brkping) {
 
-    var breaklength = nodeRequire('remote').getGlobal('naptrack').settings.duration;
-    var clock = nodeRequire('remote').getGlobal('naptrack').clock;
-    var nap = nodeRequire('remote').getGlobal('naptrack').settings.nap;
+    var brklength = nodeRequire('remote').getGlobal('catnap').settings.duration;
+    var clock = nodeRequire('remote').getGlobal('catnap').clock;
+    var brk = nodeRequire('remote').getGlobal('catnap').settings.brk;
 
-    $('#clockinfo').html( (nap-clock) + ' minutes until your next '+breaklength+' minute break');
+    $('#clockinfo').html( (brk-clock) + ' minutes until your next '+brklength+' minute break');
 
   } else {
     $('#clockinfo').html('Stretch your legs!');
@@ -67,7 +67,7 @@ function updateClockText() {
 
   // Update cat face
   $('.header .catface').removeClass('cat1 cat2 cat3 cat4 cat5');
-  $('.header .catface').addClass('cat'+nodeRequire('remote').getGlobal('naptrack').catInUse);
+  $('.header .catface').addClass('cat'+nodeRequire('remote').getGlobal('catnap').catInUse);
 
 }
 

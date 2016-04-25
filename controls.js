@@ -1,6 +1,6 @@
 $(function() {
 
-  var napVal=60, durVal=5, skipVal=0, mouseTrack=true, windowTrack=true;
+  var brkVal=60, durVal=5, skipVal=0, mouseTrack=true, windowTrack=true;
 
   // Load from settings?
   if (localStorage.getItem('catnap')) {
@@ -9,48 +9,48 @@ $(function() {
 
     if (settings.settingsVersion!==version) {
 
-        alert('Catnap has been updated, you\'ll need to reconfigure your settings.');
+        alert('catnap has been updated, you\'ll need to reconfigure your settings.');
 
     } else {
 
-        nodeRequire('remote').getGlobal('naptrack').settings.nap=settings.nap;
-        napVal=settings.nap;
-        $('#nap-wait-val').html('<i class="fa fa-clock-o "></i> '+napVal+' minutes');
+        nodeRequire('remote').getGlobal('catnap').settings.brk=settings.brk;
+        brkVal=settings.brk;
+        $('#brk-wait-val').html('<i class="fa fa-clock-o "></i> '+brkVal+' minutes');
 
-        nodeRequire('remote').getGlobal('naptrack').settings.duration=settings.duration;
+        nodeRequire('remote').getGlobal('catnap').settings.duration=settings.duration;
         durVal=settings.duration;
-        $('#nap-duration-val').html('<i class="fa fa-clock-o "></i> '+durVal+' minutes');
+        $('#brk-duration-val').html('<i class="fa fa-clock-o "></i> '+durVal+' minutes');
 
-        nodeRequire('remote').getGlobal('naptrack').settings.skip=settings.skip;
+        nodeRequire('remote').getGlobal('catnap').settings.skip=settings.skip;
         skipVal=settings.skip;
         $('#skip-val').html('<i class="fa fa-repeat"></i> '+readableNumbers[skipVal]);
 
         // Check the checkboxes!
         if (!settings.tracking.mouse) {
           $('#track-mouse').prop('checked', false);
-          nodeRequire('remote').getGlobal('naptrack').tracking.mouse=false;
+          nodeRequire('remote').getGlobal('catnap').tracking.mouse=false;
         }
         if (!settings.tracking.windows) {
           $('#track-windows').prop('checked', false);
-          nodeRequire('remote').getGlobal('naptrack').tracking.windows=false;
+          nodeRequire('remote').getGlobal('catnap').tracking.windows=false;
         }
 
     }
 
   }
 
-   $( "#nap-wait" ).slider({
+   $( "#brk-wait" ).slider({
      orientation: "horizontal",
      range: "min",
      min: 15,
      max: 180,
-     value: napVal,
+     value: brkVal,
      slide: function( event, ui ) {
        // Update UI
-       $('#nap-wait-val').html('<i class="fa fa-clock-o "></i> '+ui.value+' minutes');
+       $('#brk-wait-val').html('<i class="fa fa-clock-o "></i> '+ui.value+' minutes');
 
        // Update global
-       nodeRequire('remote').getGlobal('naptrack').settings.nap = ui.value;
+       nodeRequire('remote').getGlobal('catnap').settings.brk = ui.value;
 
        saveToLocalStorage();
 
@@ -59,7 +59,7 @@ $(function() {
    });
 
 
-   $( "#nap-length" ).slider({
+   $( "#brk-length" ).slider({
      orientation: "horizontal",
      range: "min",
      min: 1,
@@ -67,10 +67,10 @@ $(function() {
      value: durVal,
      slide: function( event, ui ) {
        // Update UI
-       $('#nap-duration-val').html('<i class="fa fa-clock-o "></i> '+ui.value+' minutes');
+       $('#brk-duration-val').html('<i class="fa fa-clock-o "></i> '+ui.value+' minutes');
 
        // Update global
-       nodeRequire('remote').getGlobal('naptrack').settings.duration = ui.value;
+       nodeRequire('remote').getGlobal('catnap').settings.duration = ui.value;
 
        saveToLocalStorage();
 
@@ -90,7 +90,7 @@ $(function() {
        $('#skip-val').html('<i class="fa fa-repeat "></i> '+readableNumbers[ui.value]);
 
        // Update global
-       nodeRequire('remote').getGlobal('naptrack').settings.skip = ui.value;
+       nodeRequire('remote').getGlobal('catnap').settings.skip = ui.value;
 
        saveToLocalStorage();
 
@@ -107,15 +107,15 @@ $(function() {
  function checkboxChanged() {
 
     if($('#track-mouse').is(":checked")){
-      nodeRequire('remote').getGlobal('naptrack').tracking.mouse=true;
+      nodeRequire('remote').getGlobal('catnap').tracking.mouse=true;
     } else {
-      nodeRequire('remote').getGlobal('naptrack').tracking.mouse=false;
+      nodeRequire('remote').getGlobal('catnap').tracking.mouse=false;
     }
 
     if($('#track-windows').is(":checked")){
-      nodeRequire('remote').getGlobal('naptrack').tracking.windows=true;
+      nodeRequire('remote').getGlobal('catnap').tracking.windows=true;
     } else {
-      nodeRequire('remote').getGlobal('naptrack').tracking.windows=false;
+      nodeRequire('remote').getGlobal('catnap').tracking.windows=false;
     }
 
     saveToLocalStorage();
@@ -126,12 +126,12 @@ $(function() {
 function saveToLocalStorage() {
   // Saves current settings to local storage.
   var settings = {
-    nap: nodeRequire('remote').getGlobal('naptrack').settings.nap,
-    duration: nodeRequire('remote').getGlobal('naptrack').settings.duration,
-    skip: nodeRequire('remote').getGlobal('naptrack').settings.skip,
+    brk: nodeRequire('remote').getGlobal('catnap').settings.brk,
+    duration: nodeRequire('remote').getGlobal('catnap').settings.duration,
+    skip: nodeRequire('remote').getGlobal('catnap').settings.skip,
     tracking: {
-      mouse: nodeRequire('remote').getGlobal('naptrack').tracking.mouse,
-      windows: nodeRequire('remote').getGlobal('naptrack').tracking.windows
+      mouse: nodeRequire('remote').getGlobal('catnap').tracking.mouse,
+      windows: nodeRequire('remote').getGlobal('catnap').tracking.windows
     },
     settingsVersion: version
   }

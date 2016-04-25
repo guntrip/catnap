@@ -88,7 +88,7 @@ function createWindow () {
   mainWindow.setMenuBarVisibility(false);
   if (devTools) { mainWindow.webContents.openDevTools(); }
 
-  mainWindow.loadURL('file://' + __dirname + '/index.html');
+  mainWindow.loadURL('file://' + __dirname + '/settings.html');
 
   electronScreen = electron.screen;
 

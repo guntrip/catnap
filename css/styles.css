@@ -40,11 +40,11 @@ body {
   background-size: 100% 100%;
 }
 
-    .header .catface.cat1 { background-image: url("icons/1.png"); }
-    .header .catface.cat2 { background-image: url("icons/2.png"); }
-    .header .catface.cat3 { background-image: url("icons/3.png"); }
-    .header .catface.cat4 { background-image: url("icons/4.png"); }
-    .header .catface.cat5 { background-image: url("icons/5.png"); }
+    .header .catface.cat1 { background-image: url("../icons/1.png"); }
+    .header .catface.cat2 { background-image: url("../icons/2.png"); }
+    .header .catface.cat3 { background-image: url("../icons/3.png"); }
+    .header .catface.cat4 { background-image: url("../icons/4.png"); }
+    .header .catface.cat5 { background-image: url("../icons/5.png"); }
 
 .header .status {
   display:inline-block;
@@ -138,15 +138,15 @@ body {
     width:125px;
     height:125px;
     background-size: 100% 100%;
-    background-image: url("icons/5.png");
+    background-image: url("../icons/5.png");
   }
 
   body.brk .brkcat.peek {
-    background-image: url("icons/peek.png");
+    background-image: url("../icons/peek.png");
   }
 
   body.brk .peekloader {
-    background-image: url("icons/peek.png");
+    background-image: url("../icons/peek.png");
     display:none;
   }
 

@@ -42,10 +42,10 @@ $(function() {
 
   }
 
-})
+});
 
 // Completely pointless peeking eye fun
-$(function() {startPeek(); } );
+$(function() { startPeek(); } );
 
 var mpos = {x:0,y:0}, escreen = electron.screen, ploop=null;
 

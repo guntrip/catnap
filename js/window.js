@@ -1,5 +1,4 @@
-var version = "0.01"; // alter with a format change to the settings stored in
-                      // local storage, will ask the user to reconfigure.
+var version = "0.01"; // change when the format of the stored settings changed.
 
 var readableNumbers=["Never", "Once", "Twice", "Thrice"];
 
@@ -27,19 +26,15 @@ function lastThreeTitles(array) {
   return result;
 }
 
-function brkTest() {
-  ipc.send('brk');
-}
-
 function updateClockText() {
 
   // status
   if (nodeRequire('remote').getGlobal('catnap').enabled) {
-    if (nodeRequire('remote').getGlobal('catnap').brkping) {
+    if (nodeRequire('remote').getGlobal('catnap').breaktime) {
       $('#playpause').html('Break time');
     } else {
       if (nodeRequire('remote').getGlobal('catnap').snoozing) {
-        $('#playpause').html('Snoozing');
+        $('#playpause').html('Break skipped.');
       } else {
         if ( (!nodeRequire('remote').getGlobal('catnap').tracking.mouse) && (!nodeRequire('remote').getGlobal('catnap').tracking.windows) ) {
           $('#playpause').html('Counting down');
@@ -53,7 +48,7 @@ function updateClockText() {
   }
 
   // WAit
-  if (!nodeRequire('remote').getGlobal('catnap').brkping) {
+  if (!nodeRequire('remote').getGlobal('catnap').breaktime) {
 
     var brklength = nodeRequire('remote').getGlobal('catnap').settings.duration;
     var clock = nodeRequire('remote').getGlobal('catnap').clock;
@@ -68,10 +63,6 @@ function updateClockText() {
   // Update cat face
   $('.header .catface').removeClass('cat1 cat2 cat3 cat4 cat5');
   $('.header .catface').addClass('cat'+nodeRequire('remote').getGlobal('catnap').catInUse);
-
-}
-
-function updateCat() {
 
 }
 

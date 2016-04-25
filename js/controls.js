@@ -1,5 +1,6 @@
 $(function() {
 
+  // Default settings. Should match global.catnap.
   var brkVal=60, durVal=5, skipVal=0, mouseTrack=true, windowTrack=true;
 
   // Load from settings?
@@ -53,8 +54,8 @@ $(function() {
        nodeRequire('remote').getGlobal('catnap').settings.brk = ui.value;
 
        saveToLocalStorage();
-
        updateClockText();
+
      }
    });
 
@@ -73,7 +74,6 @@ $(function() {
        nodeRequire('remote').getGlobal('catnap').settings.duration = ui.value;
 
        saveToLocalStorage();
-
        updateClockText();
 
      }
@@ -93,30 +93,19 @@ $(function() {
        nodeRequire('remote').getGlobal('catnap').settings.skip = ui.value;
 
        saveToLocalStorage();
-
        updateClockText();
      }
    });
 
 
   updateClockText();
-  // $( "#amount" ).val( $( "#slider-vertical" ).slider( "value" ) );
 
  });
 
  function checkboxChanged() {
 
-    if($('#track-mouse').is(":checked")){
-      nodeRequire('remote').getGlobal('catnap').tracking.mouse=true;
-    } else {
-      nodeRequire('remote').getGlobal('catnap').tracking.mouse=false;
-    }
-
-    if($('#track-windows').is(":checked")){
-      nodeRequire('remote').getGlobal('catnap').tracking.windows=true;
-    } else {
-      nodeRequire('remote').getGlobal('catnap').tracking.windows=false;
-    }
+    nodeRequire('remote').getGlobal('catnap').tracking.mouse = $('#track-mouse').is(":checked");
+    nodeRequire('remote').getGlobal('catnap').tracking.windows = $('#track-windows').is(":checked");
 
     saveToLocalStorage();
     updateClockText();
@@ -124,7 +113,9 @@ $(function() {
  }
 
 function saveToLocalStorage() {
+
   // Saves current settings to local storage.
+  
   var settings = {
     brk: nodeRequire('remote').getGlobal('catnap').settings.brk,
     duration: nodeRequire('remote').getGlobal('catnap').settings.duration,
@@ -135,5 +126,7 @@ function saveToLocalStorage() {
     },
     settingsVersion: version
   }
+
   localStorage.setItem('catnap', JSON.stringify(settings));
+
 }

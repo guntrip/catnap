@@ -66,8 +66,15 @@ app.on('activate', function () {
 
 function createWindow () {
 
-  mainWindow = new BrowserWindow({width: 435,
-                                  height: 270,
+  var windowSize={x:450, y:285};
+
+  // Fiddle the window size if we're on OSX.
+  if (process.platform === 'darwin') {
+  windowSize={x:435, y:270};
+  }
+
+  mainWindow = new BrowserWindow({width: windowSize.x,
+                                  height: windowSize.y,
                                   maximizable:false,
                                   minimizable: true,
                                   closable: true,
@@ -303,9 +310,17 @@ function napTime() {
       skipHeight=40; // Increase window height for skip button
     }
 
+
+    var windowSize={x:400, y:250};
+
+    // Fiddle the window size if we're on OSX.
+    if (process.platform === 'darwin') {
+    windowSize={x:400, y:230};
+    }
+
     // create nap window
-    napWindow = new BrowserWindow({width: 400,
-                                   height: 230+skipHeight,
+    napWindow = new BrowserWindow({width: windowSize.x,
+                                   height: windowSize.y+skipHeight,
                                    icon: 'icons/5-32.png',
                                    center: true,
                                    maximizable:false,

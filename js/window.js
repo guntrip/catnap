@@ -1,4 +1,4 @@
-var version = "0.01"; // change when the format of the stored settings changed.
+var version = "0.1.0"; // change when the format of the stored settings changed.
 
 var readableNumbers=["Never", "Once", "Twice", "Thrice"];
 

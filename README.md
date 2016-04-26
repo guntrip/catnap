@@ -25,6 +25,8 @@ to add some form of keyboard tracking soon.
 
 If you disable both *mouse* and *windows*, the application just acts as a timer.
 
+Right click the tray icon/menu icon to disable cat nap and to make it launch on start up.
+
 ## Installation
 
 Check the releases for Windows and OSX installers.

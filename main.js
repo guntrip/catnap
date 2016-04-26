@@ -1,11 +1,63 @@
 'use strict';
 
+var app = require('app');
+var path = require('path');
+var cp = require('child_process');
+
+var handleSquirrelEvent = function() {
+   if (process.platform != 'win32') {
+      return false;
+   }
+
+   function executeSquirrelCommand(args, done) {
+      var updateDotExe = path.resolve(path.dirname(process.execPath),
+         '..', 'update.exe');
+      var child = cp.spawn(updateDotExe, args, { detached: true });
+      child.on('close', function(code) {
+         done();
+      });
+   };
+
+   function install(done) {
+      var target = path.basename(process.execPath);
+      executeSquirrelCommand(["--createShortcut", target], done);
+   };
+
+   function uninstall(done) {
+      var target = path.basename(process.execPath);
+      executeSquirrelCommand(["--removeShortcut", target], done);
+   };
+
+   var squirrelEvent = process.argv[1];
+   switch (squirrelEvent) {
+      case '--squirrel-install':
+         install(app.quit);
+         return true;
+      case '--squirrel-updated':
+         install(app.quit);
+         return true;
+      case '--squirrel-obsolete':
+         app.quit();
+         return true;
+      case '--squirrel-uninstall':
+         uninstall(app.quit);
+         return true;
+   }
+
+   return false;
+};
+
+if (handleSquirrelEvent()) {
+   return;
+}
+
 const electron = require('electron');
 const ipc = require('ipc');
-const app = electron.app;
+//const app = electron.app;
 const BrowserWindow = electron.BrowserWindow;
 const Menu = electron.Menu;
 const Tray = electron.Tray;
+var AutoLaunch = require('auto-launch');
 let mainWindow;
 let brkWindow;
 
@@ -60,8 +112,14 @@ global.catnap = {
   breaktime: false, // presently breaktime?
   catInUse:'1', // current icon (1-5)
   skipCount: 0, // how many times have we skipd?
-  snoozing: false
+  snoozing: false,
+  startup: false
 };
+
+var catNapAutoLauncher = new AutoLaunch({
+	name: 'catnap',
+	isHidden: true // hidden on launch - only works on a mac atm.
+});
 
 var closedByskip=false;
 
@@ -114,21 +172,44 @@ function windowShow() {
 
 function createTrayIcon() {
 
+  if (appIcon) { appIcon.destroy(); }
+
+  catNapAutoLauncher.isEnabled().then(
+    function success(isEnabled) {
+      if (isEnabled) {
+      global.catnap.startup=true;
+      createTrayMenu(); // re..create.
+      }
+    });
+
   appIcon = new Tray(__dirname + '/icons/1-16.png');
 
-  var contextMenu = Menu.buildFromTemplate([
-    { label: 'Open window', click:windowShow },
-    { label: 'Enabled', type: 'checkbox', checked: true, click:function(item) {
-      toggleEnabled(item.checked);
-    } },
-    { label: 'Break now', click:brkTime },
-    { type: 'separator' },
-    { label: 'Exit', click:function() { app.quit(); } }
-  ]);
-
-  appIcon.setContextMenu(contextMenu);
+  createTrayMenu();
 
   appIcon.on('click', windowShow);
+
+}
+
+function createTrayMenu() {
+
+  if (appIcon) {
+
+    var contextMenu = Menu.buildFromTemplate([
+      { label: 'Open window', click:windowShow },
+      { label: 'Enabled', type: 'checkbox', checked: true, click:function(item) {
+        toggleEnabled(item.checked);
+      } },
+      { label: 'Launch on startup', type: 'checkbox', checked: global.catnap.startup, click:function(item) {
+        toggleStartup(item.checked);
+      } },
+      { label: 'Break now', click:brkTime },
+      { type: 'separator' },
+      { label: 'Exit', click:function() { app.quit(); } },
+    ]);
+
+    appIcon.setContextMenu(contextMenu);
+
+  }
 
 }
 
@@ -139,7 +220,7 @@ function changeIcon(iconref) {
 
   appIcon.setImage(__dirname + '/icons/'+iconref+'-'+iconSize+'.png');
   updateTooltip();
-  
+
 }
 
 function updateTooltip() {
@@ -163,10 +244,21 @@ function toggleEnabled(enabled) {
   } else {
     global.catnap.enabled=false;
     stopCheck();
-    console.log('stopping');
   }
 
   updateCatFaces();
+
+}
+
+function toggleStartup(enabled) {
+
+  if (enabled) {
+    catNapAutoLauncher.enable();
+    global.catnap.startup=true;
+  } else {
+    catNapAutoLauncher.disable();
+    global.catnap.startup=false;
+  }
 
 }
 

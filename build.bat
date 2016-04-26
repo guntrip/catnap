@@ -1,1 +1,0 @@
-electron-packager . --all --platform=win32 --arch=all --icon=icons/icon.ico --asar=true --out=builds/ --overwrite

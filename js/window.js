@@ -30,35 +30,38 @@ function updateClockText() {
 
   // status
   if (nodeRequire('remote').getGlobal('catnap').enabled) {
-    if (nodeRequire('remote').getGlobal('catnap').breaktime) {
-      $('#playpause').html('Break time');
-    } else {
-      if (nodeRequire('remote').getGlobal('catnap').snoozing) {
-        $('#playpause').html('Break skipped.');
-      } else {
-        if ( (!nodeRequire('remote').getGlobal('catnap').tracking.mouse) && (!nodeRequire('remote').getGlobal('catnap').tracking.windows) ) {
-          $('#playpause').html('Counting down');
+
+        if (nodeRequire('remote').getGlobal('catnap').breaktime) {
+          $('#playpause').html('Break time');
         } else {
-          $('#playpause').html('Tracking activity');
+          if (nodeRequire('remote').getGlobal('catnap').snoozing) {
+            $('#playpause').html('Break skipped.');
+          } else {
+            if ( (!nodeRequire('remote').getGlobal('catnap').tracking.mouse) && (!nodeRequire('remote').getGlobal('catnap').tracking.windows) ) {
+              $('#playpause').html('Counting down');
+            } else {
+              $('#playpause').html('Tracking activity');
+            }
+          }
         }
+
+      // WAit
+      if (!nodeRequire('remote').getGlobal('catnap').breaktime) {
+
+        var brklength = nodeRequire('remote').getGlobal('catnap').settings.duration;
+        var clock = nodeRequire('remote').getGlobal('catnap').clock;
+        var brk = nodeRequire('remote').getGlobal('catnap').settings.brk;
+
+        $('#clockinfo').html( (brk-clock) + ' minutes until your next '+brklength+' minute break');
+
+      } else {
+        $('#clockinfo').html('Stretch your legs!');
       }
+
+    } else {
+      $('#playpause').html('Disabled');
+      $('#clockinfo').html('You are now resting manually.');
     }
-  } else {
-    $('#playpause').html('Disabled');
-  }
-
-  // WAit
-  if (!nodeRequire('remote').getGlobal('catnap').breaktime) {
-
-    var brklength = nodeRequire('remote').getGlobal('catnap').settings.duration;
-    var clock = nodeRequire('remote').getGlobal('catnap').clock;
-    var brk = nodeRequire('remote').getGlobal('catnap').settings.brk;
-
-    $('#clockinfo').html( (brk-clock) + ' minutes until your next '+brklength+' minute break');
-
-  } else {
-    $('#clockinfo').html('Stretch your legs!');
-  }
 
   // Update cat face
   $('.header .catface').removeClass('cat1 cat2 cat3 cat4 cat5');

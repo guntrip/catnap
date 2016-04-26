@@ -118,6 +118,9 @@ function createTrayIcon() {
 
   var contextMenu = Menu.buildFromTemplate([
     { label: 'Open window', click:windowShow },
+    { label: 'Enabled', type: 'checkbox', checked: true, click:function(item) {
+      toggleEnabled(item.checked);
+    } },
     { label: 'Break now', click:brkTime },
     { type: 'separator' },
     { label: 'Exit', click:function() { app.quit(); } }
@@ -135,12 +138,31 @@ function changeIcon(iconref) {
 }
 
 function updateTooltip() {
-  if (global.catnap.settings.breaktime) {
-  appIcon.setToolTip('Time for a break.');
+  if (global.catnap.enabled) {
+    if (global.catnap.settings.breaktime) {
+    appIcon.setToolTip('Time for a break.');
+    } else {
+    var minutesLeft = global.catnap.settings.brk -  global.catnap.clock;
+    appIcon.setToolTip(minutesLeft+' minutes until your next break.');
+    }
   } else {
-  var minutesLeft = global.catnap.settings.brk -  global.catnap.clock;
-  appIcon.setToolTip(minutesLeft+' minutes until your next break.');
+    appIcon.setToolTip('Cat nap is disabled.');
   }
+}
+
+function toggleEnabled(enabled) {
+
+  if (enabled) {
+    global.catnap.enabled=true;
+    initCheck();
+  } else {
+    global.catnap.enabled=false;
+    stopCheck();
+    console.log('stopping');
+  }
+
+  updateCatFaces();
+
 }
 
 function updateCatFaces() {

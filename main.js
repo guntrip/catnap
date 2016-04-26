@@ -9,6 +9,8 @@ const Tray = electron.Tray;
 let mainWindow;
 let brkWindow;
 
+if (require('electron-squirrel-startup')) return;
+
 var electronScreen = null, appIcon = null, checkProcess = null, brkProcess = null;
 
 app.on('ready', function () {
@@ -28,6 +30,7 @@ app.on('activate', function () {
     createWindow();
   }
 });
+
 
 var devTools=false; // opens dev tools and expands window sizes.
 
@@ -111,7 +114,7 @@ function windowShow() {
 
 function createTrayIcon() {
 
-  appIcon = new Tray('icons/1-16.png');
+  appIcon = new Tray(__dirname + '/icons/1-16.png');
 
   var contextMenu = Menu.buildFromTemplate([
     { label: 'Open window', click:windowShow },
@@ -127,7 +130,7 @@ function createTrayIcon() {
 }
 
 function changeIcon(iconref) {
-  appIcon.setImage('icons/'+iconref+'-16.png');
+  appIcon.setImage(__dirname + '/icons/'+iconref+'-16.png');
   updateTooltip();
 }
 

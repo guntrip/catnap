@@ -133,8 +133,13 @@ function createTrayIcon() {
 }
 
 function changeIcon(iconref) {
-  appIcon.setImage(__dirname + '/icons/'+iconref+'-16.png');
+
+  var iconSize='16';
+  if (process.platform === 'darwin') iconSize='32';
+
+  appIcon.setImage(__dirname + '/icons/'+iconref+'-'+iconSize+'.png');
   updateTooltip();
+  
 }
 
 function updateTooltip() {

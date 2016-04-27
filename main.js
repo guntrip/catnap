@@ -290,9 +290,7 @@ function updateCatFaces() {
     // Update global for mainWindow
     global.catnap.catInUse=image;
 
-    if (mainWindow!==null) {
-    mainWindow.webContents.executeJavaScript('updateClockText()');
-    }
+    if (mainWindow) mainWindow.webContents.executeJavaScript('updateClockText()');
 
 }
 
@@ -438,7 +436,7 @@ function brkTime() {
     if (brkProcess) { clearInterval(brkProcess); }
     brkProcess = setInterval(brkInterval, 1000); // 1000. Shorten for debugging.
 
-    mainWindow.webContents.executeJavaScript('updateClockText()');
+    if (mainWindow) mainWindow.webContents.executeJavaScript('updateClockText()');
     updateTooltip();
 
   }

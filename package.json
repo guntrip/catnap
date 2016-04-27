@@ -1,7 +1,7 @@
 {
   "name": "catnap",
   "productName": "catnap",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A break timer",
   "main": "main.js",
   "scripts": {

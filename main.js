@@ -116,9 +116,13 @@ global.catnap = {
   startup: false
 };
 
+var filePath=process.execPath;
+if (process.platform==='darwin') filePath = '/Applications/catnap.app';
+
 var catNapAutoLauncher = new AutoLaunch({
 	name: 'catnap',
-	isHidden: true // hidden on launch - only works on a mac atm.
+  path: filePath,
+	isHidden: true
 });
 
 var closedByskip=false;
@@ -207,7 +211,7 @@ function createTrayMenu() {
       } },
       { label: 'Break now', click:brkTime },
       { type: 'separator' },
-      { label: 'Exit', click:function() { app.quit(); } },
+      { label: 'Exit', click:function() { app.quit(); } }
     ]);
 
     appIcon.setContextMenu(contextMenu);
@@ -290,7 +294,7 @@ function updateCatFaces() {
     // Update global for mainWindow
     global.catnap.catInUse=image;
 
-    if (mainWindow) mainWindow.webContents.executeJavaScript('updateClockText()');
+    if (mainWindow!==null) mainWindow.webContents.executeJavaScript('updateClockText()');
 
 }
 
@@ -436,7 +440,7 @@ function brkTime() {
     if (brkProcess) { clearInterval(brkProcess); }
     brkProcess = setInterval(brkInterval, 1000); // 1000. Shorten for debugging.
 
-    if (mainWindow) mainWindow.webContents.executeJavaScript('updateClockText()');
+    if (mainWindow!==null) mainWindow.webContents.executeJavaScript('updateClockText()');
     updateTooltip();
 
   }

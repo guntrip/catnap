@@ -182,7 +182,10 @@ function createTrayIcon() {
       }
     });
 
-  appIcon = new Tray(__dirname + '/icons/1-16.png');
+  var iconSize='16';
+  if (process.platform === 'darwin') iconSize='32@2x';
+
+  appIcon = new Tray(__dirname + '/icons/1-'+iconSize+'.png');
 
   createTrayMenu();
 
@@ -216,7 +219,7 @@ function createTrayMenu() {
 function changeIcon(iconref) {
 
   var iconSize='16';
-  if (process.platform === 'darwin') iconSize='32';
+  if (process.platform === 'darwin') iconSize='32@2x';
 
   appIcon.setImage(__dirname + '/icons/'+iconref+'-'+iconSize+'.png');
   updateTooltip();
